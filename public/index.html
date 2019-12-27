@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%">
   <head>
     <meta charset="utf-8" />
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
@@ -25,10 +25,17 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    <script
+      type="text/javascript"
+      src="http://cdn-files.deezer.com/js/min/dz.js"
+    ></script>
   </head>
-  <body>
+
+  <body style="height: 100%">
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <div id="dz-root"></div>
+    <div id="player"></div>
+    <div id="root" style="height: 100%"></div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -39,5 +46,27 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <script>
+      window.dzAsyncInit = function() {
+        const result = DZ.init({
+          appId: "386204",
+          channelUrl: "http://localhost:3000/channel.html",
+          player: {
+            container: "player",
+            width: 0,
+            height: 0,
+            onload: function() {}
+          }
+        });
+
+        console.log(result);
+      };
+      (function() {
+        var e = document.createElement("script");
+        e.src = "https://e-cdns-files.dzcdn.net/js/min/dz.js";
+        e.async = true;
+        document.getElementById("dz-root").appendChild(e);
+      })();
+    </script>
   </body>
 </html>
