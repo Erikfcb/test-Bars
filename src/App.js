@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import styled, { keyframes } from "styled-components";
-import { Button } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 import { Item } from "./Item";
+
+// naplam death you suffer >> shortest song to check what happens when song ends
 
 const App = () => {
   const trackUrl = "https://deezerdevs-deezer.p.rapidapi.com/track/";
@@ -16,9 +18,8 @@ const App = () => {
   const [trackList, setTrackList] = useState([]);
   const [queue, setQueue] = useState([]);
   const [current, setCurrent] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   console.log("current :", current);
-
-  console.log("queue :", queue);
 
   useEffect(() => {
     window.DZ.player.setRepeat(0);
@@ -38,7 +39,15 @@ const App = () => {
   useEffect(() => {
     // Callback function is called when the currently playing track has changed
     window.DZ.Event.subscribe("tracklist_changed", function(track) {
-      console.log("tracklist_changed track:");
+      console.log("tracklist_changed track:", track);
+    });
+
+    window.DZ.Event.subscribe("player_play", function() {
+      setIsPlaying(true);
+    });
+
+    window.DZ.Event.subscribe("player_paused", function() {
+      setIsPlaying(false);
     });
 
     // Callback function is called when the volume level of the current player has changed
@@ -85,27 +94,28 @@ const App = () => {
       setQueue([...temp]);
     });
   }, [trackList]);
+  console.log("trackList :", trackList);
 
   return (
     <Wrapper id="wrapper">
       <Host>
-        <Button
+        <MyButton
           onClick={() => {
             playTrack();
           }}
           disabled={!trackList.length}
         >
           Play
-        </Button>
-        <Button
+        </MyButton>
+        <MyButton
           onClick={() => {
             pauseTrack();
           }}
-          disabled={!trackList.length}
+          disabled={!isPlaying}
         >
           Pause
-        </Button>
-        <Button
+        </MyButton>
+        <MyButton
           onClick={() => {
             playNext();
             const temp = [...trackList];
@@ -115,11 +125,11 @@ const App = () => {
           disabled={trackList.length < 1 || !queue.length}
         >
           Next
-        </Button>
+        </MyButton>
         <div>Current:</div>
-        {current && <Item element={current} />}
+        {current && <Item element={current} isPlaying={isPlaying} />}
         <div>
-          Track List:
+          Next to be played:
           {queue.map(element => (
             <Item element={element} />
           ))}
@@ -160,18 +170,21 @@ const Wrapper = styled.div`
 `;
 
 const Host = styled.div`
+  padding 20px;
   margin-top: 20px;
   display: flex;
   flex-direction: column;
   width: 50%;
   height: 100%;
   background-color: #ebebeb;
-`;
+  `;
 const Guest = styled.div`
+  padding 20px;
   margin-top: 20px;
   display: flex;
   flex-direction: column;
   width: 50%;
+  background-color: #ebf2ff;
   height: 100%;
 `;
 
@@ -191,4 +204,8 @@ const Loader = styled.div`
   width: 120px;
   height: 120px;
   animation: ${spin} 2s linear infinite;
+`;
+
+const MyButton = styled(Button)`
+  width: 100px;
 `;
