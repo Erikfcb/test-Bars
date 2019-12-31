@@ -15,11 +15,12 @@ export const Item = ({
     <Card.Body>
       <Card.Title>Album: {album.title}</Card.Title>
       <Card.Text>
-        <div>Artist: {artist.name}</div>
-        <div>
+        <span>Artist: {artist.name}</span>
+        <br />
+        <span>
           Duration: {Math.floor(duration / 60)}m:
           {duration % 60}s
-        </div>
+        </span>
       </Card.Text>
       {onClick && (
         <Button variant="primary" onClick={() => onClick(id)}>

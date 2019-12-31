@@ -6,6 +6,29 @@ import { Item } from "./Item";
 // naplam death you suffer >> shortest song to check what happens when song ends
 
 const App = () => {
+  useEffect(() => {
+    window.dzAsyncInit = function() {
+      window.DZ.init({
+        appId: "386204",
+        channelUrl: "http://localhost:3000/channel.html",
+        player: {
+          container: "player",
+          width: 0,
+          height: 0,
+          onload: function() {
+            window.DZ.player.setRepeat(0);
+          }
+        }
+      });
+    };
+    (function() {
+      var e = document.createElement("script");
+      e.src = "https://e-cdns-files.dzcdn.net/js/min/dz.js";
+      e.async = true;
+      document.getElementById("dz-root").appendChild(e);
+    })();
+  }, []);
+
   const trackUrl = "https://deezerdevs-deezer.p.rapidapi.com/track/";
   const searchUrl = "https://deezerdevs-deezer.p.rapidapi.com/search&q=";
   const headers = {
@@ -22,9 +45,6 @@ const App = () => {
   console.log("current :", current);
 
   useEffect(() => {
-    window.DZ.player.setRepeat(0);
-  }, []);
-  useEffect(() => {
     setResults([]);
     query &&
       fetch(searchUrl + query, { headers })
@@ -37,26 +57,28 @@ const App = () => {
   }, [query]);
 
   useEffect(() => {
-    // Callback function is called when the currently playing track has changed
-    window.DZ.Event.subscribe("tracklist_changed", function(track) {
-      console.log("tracklist_changed track:", track);
-    });
+    if (window.DZ) {
+      // Callback function is called when the currently playing track has changed
+      window.DZ.Event.subscribe("tracklist_changed", function(track) {
+        console.log("tracklist_changed track:", track);
+      });
 
-    window.DZ.Event.subscribe("player_play", function() {
-      setIsPlaying(true);
-    });
+      window.DZ.Event.subscribe("player_play", function() {
+        setIsPlaying(true);
+      });
 
-    window.DZ.Event.subscribe("player_paused", function() {
-      setIsPlaying(false);
-    });
+      window.DZ.Event.subscribe("player_paused", function() {
+        setIsPlaying(false);
+      });
 
-    // Callback function is called when the volume level of the current player has changed
-    window.DZ.Event.subscribe("track_end", function(ended) {
-      console.log("track_end event fired");
-      const temp = [...trackList];
-      temp.shift();
-      setTrackList([...temp]);
-    });
+      // Callback function is called when the volume level of the current player has changed
+      window.DZ.Event.subscribe("track_end", function() {
+        console.log("track_end event fired");
+        const temp = [...trackList];
+        temp.shift();
+        setTrackList([...temp]);
+      });
+    }
   }, [trackList]);
 
   useEffect(() => {
@@ -71,7 +93,7 @@ const App = () => {
   }, []);
   const playNext = useCallback(() => {
     window.DZ.player.next();
-  });
+  }, []);
 
   const addToQueue = useCallback(
     id => {
@@ -94,6 +116,7 @@ const App = () => {
       setQueue([...temp]);
     });
   }, [trackList]);
+
   console.log("trackList :", trackList);
 
   return (
@@ -178,6 +201,7 @@ const Host = styled.div`
   height: 100%;
   background-color: #ebebeb;
   `;
+
 const Guest = styled.div`
   padding 20px;
   margin-top: 20px;
@@ -208,4 +232,5 @@ const Loader = styled.div`
 
 const MyButton = styled(Button)`
   width: 100px;
+  margin: 5px;
 `;
