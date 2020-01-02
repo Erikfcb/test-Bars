@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
-import { Item } from "./Item";
+import io from "socket.io-client";
 
-const searchUrl = "https://deezerdevs-deezer.p.rapidapi.com/search&q=";
-const headers = {
-  "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
-  "x-rapidapi-key": "DvlLOJj7ijmsheQWnO4fJjcpGQuwp1zCCuCjsnlQWe029KrNC2"
-};
+import { Item } from "./Item";
+import { baseUrl, headers, searchUrl } from "./api";
+
+const socket = io(baseUrl);
 
 const Guest = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+
+  useEffect(() => {
+    return () => socket.emit("disconnect");
+  }, []);
 
   useEffect(() => {
     setResults([]);
@@ -25,7 +28,7 @@ const Guest = () => {
   }, [query]);
 
   const addToQueue = useCallback(id => {
-    // TODO: implement
+    socket.emit("add", id);
   }, []);
 
   return (
@@ -38,7 +41,7 @@ const Guest = () => {
       />
       <Results>
         {results.map(element => (
-          <Item element={element} onClick={addToQueue} />
+          <Item element={element} onClick={() => addToQueue(element.id)} />
         ))}
       </Results>
     </Wrapper>

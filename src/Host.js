@@ -5,14 +5,15 @@ import io from "socket.io-client";
 import styled from "styled-components";
 import Button from "react-bootstrap/Button";
 import { Item } from "./Item";
-import { baseUrl } from "./api";
+import { baseUrl, headers } from "./api";
+import List from "./List";
 
 const Host = () => {
   useEffect(() => {
     window.dzAsyncInit = function() {
       window.DZ.init({
         appId: "386204",
-        channelUrl: "http://localhost:3000/channel.html",
+        channelUrl: "https://localhost:3000/channel.html",
         player: {
           container: "player",
           width: 0,
@@ -32,11 +33,21 @@ const Host = () => {
   }, []);
 
   const [trackList, setTrackList] = useState([]);
+  console.log("trackList: ", trackList);
 
   useEffect(() => {
     const socket = io(baseUrl);
+
+    socket.on("new_list", function(data) {
+      setTrackList(data);
+    });
+
     return () => socket.emit("disconnect");
   }, []);
+
+  useEffect(() => {
+    trackList.length && window.DZ.player.playTracks(trackList);
+  }, [trackList]);
 
   const playTrack = useCallback(() => {
     window.DZ.player.play();
@@ -81,6 +92,9 @@ const Host = () => {
       {/* {current && <Item element={current} isPlaying={isPlaying} />} */}
       <div>
         Next to be played:
+        {trackList.map(id => (
+          <div>{id}</div>
+        ))}
         {/* {queue.map(element => (
           <Item element={element} />
         ))} */}
