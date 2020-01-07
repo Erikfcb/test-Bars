@@ -1,5 +1,5 @@
 // export const baseUrl = "https://10.0.0.1:3001/";
-export const baseUrl = "http://172.20.10.8:8080/";
+export const baseUrl = "http://localhost:8080/";
 
 export const trackUrl = "https://deezerdevs-deezer.p.rapidapi.com/track/";
 export const playlistUrl = "https://api.deezer.com/playlist/";
